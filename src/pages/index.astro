@@ -1,9 +1,15 @@
-<!doctype html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Levanah Tech</title>
-  </head>
-  <body></body>
-</html>
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import HeroSection from '../components/HeroSection.astro';
+---
+
+<BaseLayout
+  title="Levanah Tech — Tecnologia para resolver problemas reais"
+  description="Conte o problema. A tecnologia é a nossa parte. A Levanah Tech parte do seu desafio para encontrar soluções digitais e tecnológicas adequadas."
+>
+  <Header />
+  <main id="conteudo" tabindex="-1">
+    <HeroSection />
+  </main>
+</BaseLayout>

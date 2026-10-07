@@ -1,0 +1,215 @@
+<section class="hero" aria-labelledby="hero-title">
+  <div class="container hero-inner">
+    <div class="hero-content">
+      <p class="eyebrow"><span aria-hidden="true"></span>Tecnologia com propósito</p>
+      <h1 id="hero-title">Conte o problema.<br /><span>A tecnologia é<br class="desktop-break" /> a nossa parte.</span></h1>
+      <p class="hero-description">
+        Você não precisa saber se precisa de um site, uma automação ou inteligência artificial.
+        Começamos entendendo seu desafio para encontrar a solução certa.
+      </p>
+      <div class="hero-action">
+        <!-- TODO: conectar o CTA ao canal real de contato na etapa de implementação do contato. -->
+        <button class="challenge-cta" type="button" disabled aria-describedby="hero-contact-status">
+          Conte seu desafio
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M4 12h16m-6-6 6 6-6 6" />
+          </svg>
+        </button>
+        <p id="hero-contact-status">Nosso canal de contato estará disponível em breve.</p>
+      </div>
+    </div>
+
+    <!-- Referência lunar única e decorativa; não representa uma nova versão do logo. -->
+    <div class="hero-art" aria-hidden="true">
+      <div class="light-plane"></div>
+      <div class="lunar-form"></div>
+      <span class="art-caption">Problemas reais. Novas possibilidades.</span>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    background: radial-gradient(ellipse at 85% 40%, rgb(30 75 125 / 14%), transparent 55%);
+  }
+
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    align-items: center;
+    gap: 2rem;
+    min-height: min(760px, calc(100svh - 125px));
+    padding-block: clamp(4rem, 9vw, 8rem);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+  }
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0 0 1.75rem;
+    color: var(--color-blue);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .eyebrow span {
+    width: 1.75rem;
+    height: 1px;
+    background: currentColor;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2.5rem, 4.7vw, 4.25rem);
+    font-weight: 500;
+    letter-spacing: -0.055em;
+    line-height: 1.13;
+    text-wrap: balance;
+  }
+
+  h1 span {
+    color: var(--color-gold);
+  }
+
+  .hero-description {
+    max-width: 32rem;
+    margin: 1.75rem 0 0;
+    color: var(--color-muted);
+    font-size: clamp(1rem, 1.3vw, 1.125rem);
+    line-height: 1.8;
+  }
+
+  .hero-action {
+    margin-top: 2.25rem;
+  }
+
+  .hero-action p {
+    margin: 0.875rem 0 0;
+    color: var(--color-muted);
+    font-size: 0.75rem;
+  }
+
+  .hero-art {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-width: 0;
+    aspect-ratio: 1;
+  }
+
+  .light-plane {
+    position: absolute;
+    inset: 8% 0;
+    background:
+      linear-gradient(90deg, transparent 49.8%, rgb(119 182 239 / 10%) 50%, transparent 50.2%),
+      linear-gradient(0deg, transparent 49.8%, rgb(119 182 239 / 10%) 50%, transparent 50.2%),
+      radial-gradient(ellipse, rgb(51 109 173 / 12%), transparent 70%);
+    transform: rotate(-20deg);
+  }
+
+  .lunar-form {
+    position: relative;
+    width: 73%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: linear-gradient(125deg, #142438, #080f1c 68%);
+    box-shadow:
+      inset 2px 1px 0 rgb(215 191 145 / 85%),
+      inset 18px 6px 28px -22px var(--color-gold),
+      18px 22px 50px rgb(0 0 0 / 20%);
+    transform: rotate(-25deg);
+  }
+
+  .lunar-form::after {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(ellipse at 10% 30%, rgb(215 191 145 / 12%), transparent 55%);
+    content: "";
+    animation: reveal-light 1.6s ease-out both;
+  }
+
+  .art-caption {
+    position: absolute;
+    bottom: 1%;
+    color: var(--color-muted);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+  }
+
+  @keyframes reveal-light {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @media (max-width: 900px) {
+    .hero-inner {
+      grid-template-columns: 1.4fr 1fr;
+      min-height: auto;
+      gap: 1rem;
+    }
+
+    h1 {
+      font-size: clamp(2.25rem, 5vw, 3.5rem);
+    }
+
+    .art-caption {
+      max-width: 12rem;
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      padding-block: 3.5rem 2.5rem;
+    }
+
+    h1 {
+      max-width: 32rem;
+      font-size: clamp(2.25rem, 8.5vw, 3.5rem);
+    }
+
+    .desktop-break {
+      display: none;
+    }
+
+    .hero-art {
+      width: min(100%, 240px);
+      aspect-ratio: auto;
+      grid-template-rows: auto auto;
+      gap: 0.75rem;
+      justify-self: center;
+    }
+
+    .lunar-form {
+      width: 70%;
+    }
+
+    .art-caption {
+      position: static;
+      max-width: 100%;
+      text-align: center;
+    }
+
+    .hero-action .challenge-cta {
+      width: 100%;
+    }
+
+    .eyebrow {
+      font-size: 0.6875rem;
+      letter-spacing: 0.1em;
+    }
+  }
+</style>
