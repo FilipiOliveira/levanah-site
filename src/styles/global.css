@@ -1,15 +1,22 @@
 :root {
   color-scheme: dark;
-  --color-background: #080f1c;
-  --color-surface: #101c2e;
-  --color-text: #f0f2f5;
-  --color-muted: #aebacd;
+  --color-background: #080f17;
+  --color-surface: #0e1b2d;
+  --color-text: #f8f9fb;
+  --color-muted: #9aa4b2;
   --color-blue: #77b6ef;
-  --color-gold: #d7bf91;
+  --color-gold: #f4d9a7;
   --color-border: #26354a;
   --font-body: Inter, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: Montserrat, "Segoe UI", system-ui, sans-serif;
   --content-width: 1200px;
+  --header-height: 120px;
+  --motion-fast: 180ms;
+  --motion-entry: 400ms;
+  --motion-ease: cubic-bezier(.2, .7, .2, 1);
 }
+
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-height) + 24px); }
 
 *,
 *::before,
@@ -60,7 +67,7 @@ a {
 
 .skip-link {
   position: fixed;
-  z-index: 10;
+  z-index: 30;
   top: 1rem;
   left: 1rem;
   padding: 0.75rem 1rem;
@@ -74,7 +81,6 @@ a {
   transform: translateY(0);
 }
 
-/* Os CTAs ficam desabilitados até a configuração do canal real de contato. */
 .challenge-cta {
   display: inline-flex;
   align-items: center;
@@ -89,8 +95,41 @@ a {
   font-weight: 600;
   line-height: 1.4;
   text-align: center;
-  cursor: not-allowed;
+  cursor: pointer;
+  position: relative;
+  isolation: isolate;
+  transition: background-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease;
 }
+
+.challenge-cta::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(115deg, transparent 15%, rgb(255 255 255 / 24%) 50%, transparent 85%); opacity: 0; pointer-events: none; transition: opacity var(--motion-fast) ease; }
+.challenge-cta:focus-visible { background: #ffe6bd; box-shadow: 0 4px 20px rgb(244 217 167 / 12%); }
+.challenge-cta:focus-visible::before { opacity: 1; }
+.challenge-cta:active { background: #e6c58f; box-shadow: none; }
+.challenge-cta > span, .secondary-cta > span, .text-link > span { transition: transform var(--motion-fast) var(--motion-ease); }
+.secondary-cta, .text-link, .brand { transition: color var(--motion-fast) ease; }
+.secondary-cta:focus-visible { color: var(--color-gold); }
+.brand:focus-visible { color: var(--color-gold); }
+@media (hover: hover) and (pointer: fine) {
+  .challenge-cta:hover { background: #ffe6bd; box-shadow: 0 4px 20px rgb(244 217 167 / 12%); }
+  .challenge-cta:hover::before { opacity: 1; }
+  .challenge-cta:hover > span { transform: translate(2px, -2px); }
+  .secondary-cta:hover > span { transform: translateY(3px); }
+  .text-link:hover > span { transform: translateX(3px); }
+  .brand:hover { color: var(--color-gold); }
+}
+
+h1, h2, h3, .brand { font-family: var(--font-heading); }
+h2 { margin: 0; font-size: clamp(1.75rem, 3vw, 2.65rem); font-weight: 600; line-height: 1.25; letter-spacing: -.035em; text-wrap: balance; }
+h3 { font-weight: 600; line-height: 1.4; }
+.section { padding-block: clamp(4rem, 8vw, 7rem); }
+.section-heading { max-width: 46rem; margin-bottom: 3rem; }
+.section-heading > p:last-child { max-width: 42rem; color: var(--color-muted); margin: 1.5rem 0 0; }
+.eyebrow { color: var(--color-blue); margin: 0 0 1.25rem; font-size: .75rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
+.brand { display: inline-flex; flex-direction: column; align-items: flex-start; justify-content: center; min-height: 48px; line-height: 1.2; }
+.brand-name { font-size: clamp(1.375rem, 2.4vw, 1.875rem); font-weight: 600; letter-spacing: .14em; }
+.brand-detail { font-size: .8125rem; letter-spacing: .4em; margin-top: .4rem; color: var(--color-gold); }
+.secondary-cta { display: inline-flex; align-items: center; justify-content: center; gap: .75rem; min-height: 48px; padding: .75rem 0; font-size: .875rem; font-weight: 500; }
+.secondary-cta:hover { color: var(--color-gold); }
 
 .challenge-cta svg {
   flex-shrink: 0;

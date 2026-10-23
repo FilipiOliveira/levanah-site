@@ -1,0 +1,8 @@
+---
+import { whatsappURL } from '../data/site';
+interface Props { class?: string; label?: string; }
+const { class: className = '', label = 'Conte seu desafio' } = Astro.props;
+---
+<a class:list={['challenge-cta', className]} href={whatsappURL} target="_blank" rel="noopener noreferrer" aria-label={`${label} — conversar pelo WhatsApp (abre em nova aba)`}>
+  {label}<span aria-hidden="true">↗</span>
+</a>

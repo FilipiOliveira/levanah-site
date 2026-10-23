@@ -1,0 +1,22 @@
+---
+import ContactLink from './ContactLink.astro';
+---
+<section class="section contact-section" id="contato" aria-labelledby="contact-title"><div class="container contact-panel" data-reveal>
+  <div><p class="eyebrow">O próximo passo é uma conversa</p><h2 id="contact-title">Qual desafio você quer resolver?</h2><p>Conte o que está dificultando sua rotina ou o que você gostaria de melhorar. Não precisa chegar com uma solução pronta.</p></div>
+  <div class="contact-action"><ContactLink /><p>Converse diretamente pelo WhatsApp.<br /><span>+55 (19) 98239-2167</span></p></div>
+</div></section>
+<style>
+  .contact-section { padding-top: 0; }
+  .contact-panel { display: grid; grid-template-columns: 1.5fr 1fr; align-items: center; gap: 3rem; padding: clamp(1.5rem, 5vw, 4rem); border: 1px solid rgb(244 217 167 / 30%); border-radius: .75rem; background: linear-gradient(120deg, #0e1b2d, #101c28); }
+  .contact-panel { position: relative; isolation: isolate; }
+  .contact-panel::before { content: ''; position: absolute; z-index: -1; inset: 0; pointer-events: none; border-radius: inherit; background: radial-gradient(ellipse at top right, rgb(244 217 167 / 6%), transparent 65%); opacity: .5; transition: opacity var(--motion-fast) ease; }
+  .contact-panel:focus-within::before { opacity: 1; }
+  .contact-section .eyebrow { color: var(--color-gold); }
+  .contact-panel > div { min-width: 0; }
+  h2 { max-width: 35rem; }
+  .contact-panel p { color: var(--color-muted); max-width: 36rem; margin: 1.5rem 0 0; }
+  .contact-action { justify-self: end; border-left: 1px solid rgb(244 217 167 / 20%); padding-left: clamp(1.25rem, 3vw, 2.5rem); }
+  .contact-action p { font-size: .875rem; line-height: 1.8; }
+  .contact-action span { color: var(--color-text); }
+  @media (max-width: 768px) { .contact-panel { grid-template-columns: 1fr; gap: 2rem; } .contact-action { justify-self: stretch; border-left: 0; border-top: 1px solid rgb(244 217 167 / 20%); padding: 1.5rem 0 0; } .contact-action :global(.challenge-cta) { width: 100%; } }
+</style>

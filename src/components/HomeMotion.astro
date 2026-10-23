@@ -1,0 +1,108 @@
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const menu = document.querySelector<HTMLDetailsElement>('.mobile-menu');
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-section-link]')];
+  const sections = [...document.querySelectorAll<HTMLElement>('main > section[id]')];
+  const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const animations = new Map<HTMLElement, Animation>();
+  let frame = 0;
+  let headerHeight = header?.offsetHeight ?? 120;
+
+  function updateNavigation() {
+    frame = 0;
+    const marker = headerHeight + Math.min(window.innerHeight * .25, 180);
+    const positions = sections.map(section => ({ section, top: section.getBoundingClientRect().top }));
+    const current = positions.filter(({ top }) => top <= marker).at(-1)?.section.id;
+    header?.toggleAttribute('data-scrolled', window.scrollY > 24);
+    links.forEach(link => {
+      if (link.hash === `#${current}`) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  }
+
+  function scheduleNavigation() {
+    if (!frame) frame = requestAnimationFrame(updateNavigation);
+  }
+
+  function measureHeader() {
+    headerHeight = header?.offsetHeight ?? 120;
+    document.documentElement.style.setProperty('--header-height', `${headerHeight}px`);
+    scheduleNavigation();
+  }
+
+  const resizeObserver = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measureHeader) : undefined;
+  if (header) resizeObserver?.observe(header);
+  window.addEventListener('scroll', scheduleNavigation, { passive: true });
+  window.addEventListener('resize', measureHeader, { passive: true });
+  measureHeader();
+
+  function closeMenu(event: MouseEvent) {
+    if (event.target instanceof Element && event.target.closest('a')) menu?.removeAttribute('open');
+  }
+  function handleEscape(event: KeyboardEvent) {
+    if (event.key === 'Escape' && menu?.open) {
+      menu.removeAttribute('open');
+      menu.querySelector('summary')?.focus();
+    }
+  }
+  menu?.addEventListener('click', closeMenu);
+  document.addEventListener('keydown', handleEscape);
+
+  function cancelAnimations() {
+    animations.forEach(animation => animation.cancel());
+    animations.clear();
+  }
+  function handlePreference() {
+    if (motionPreference.matches) cancelAnimations();
+  }
+  function protectFocus(event: FocusEvent) {
+    if (!(event.target instanceof Element)) return;
+    animations.forEach((animation, element) => {
+      if (element.contains(event.target as Node)) {
+        animation.cancel();
+        animations.delete(element);
+      }
+    });
+  }
+  function protectAnchor() {
+    cancelAnimations();
+    scheduleNavigation();
+  }
+  motionPreference.addEventListener('change', handlePreference);
+  document.addEventListener('focusin', protectFocus);
+  window.addEventListener('hashchange', protectAnchor);
+
+  // Only animate on entry: no hidden CSS state or dependency on the observer.
+  const observer = typeof IntersectionObserver !== 'undefined' ? new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting || !(entry.target instanceof HTMLElement)) return;
+      const element = entry.target;
+      observer?.unobserve(element);
+      element.setAttribute('data-in-view', '');
+      if (motionPreference.matches || typeof element.animate !== 'function' ||
+          element.contains(document.activeElement) || window.location.hash || window.scrollY > 0 && element.closest('.hero-content')) return;
+      const animation = element.animate(
+        [{ opacity: .85, transform: 'translateY(10px)' }, { opacity: 1, transform: 'translateY(0)' }],
+        { duration: 400, easing: 'cubic-bezier(.2, .7, .2, 1)' },
+      );
+      animations.set(element, animation);
+      animation.finished.then(() => animations.delete(element), () => animations.delete(element));
+    });
+  }, { threshold: .12 }) : undefined;
+  document.querySelectorAll<HTMLElement>('[data-reveal]').forEach(element => observer?.observe(element));
+
+  window.addEventListener('pagehide', (event: PageTransitionEvent) => {
+    if (event.persisted) { cancelAnimations(); return; }
+    observer?.disconnect();
+    resizeObserver?.disconnect();
+    cancelAnimations();
+    cancelAnimationFrame(frame);
+    window.removeEventListener('scroll', scheduleNavigation);
+    window.removeEventListener('resize', measureHeader);
+    window.removeEventListener('hashchange', protectAnchor);
+    document.removeEventListener('focusin', protectFocus);
+    document.removeEventListener('keydown', handleEscape);
+    menu?.removeEventListener('click', closeMenu);
+    motionPreference.removeEventListener('change', handlePreference);
+  });
+</script>

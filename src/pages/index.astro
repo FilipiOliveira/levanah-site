@@ -2,14 +2,98 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import HeroSection from '../components/HeroSection.astro';
+import SolutionsSection from '../components/SolutionsSection.astro';
+import ProcessSection from '../components/ProcessSection.astro';
+import AboutSection from '../components/AboutSection.astro';
+import ContactSection from '../components/ContactSection.astro';
+import Footer from '../components/Footer.astro';
+import { Image } from 'astro:assets';
+import heroScene from '../../public/imagens/hero-levanah.png';
+import HomeMotion from '../components/HomeMotion.astro';
 ---
 
 <BaseLayout
   title="Levanah Tech — Tecnologia para resolver problemas reais"
-  description="Conte o problema. A tecnologia é a nossa parte. A Levanah Tech parte do seu desafio para encontrar soluções digitais e tecnológicas adequadas."
+  description="Soluções tecnológicas que começam pelo seu desafio. Conheça a Levanah Tech e converse sobre presença digital, sites, automações e soluções personalizadas."
 >
   <Header />
   <main id="conteudo" tabindex="-1">
-    <HeroSection />
+    <div class="hero-composition" id="inicio">
+      <Image
+        class="hero-scene"
+        src={heroScene}
+        alt=""
+        widths={[640, 960, 1440, 1983]}
+        sizes="(max-width: 640px) 900px, (max-width: 900px) 1400px, 100vw"
+        format="webp"
+        quality={85}
+        loading="eager"
+        fetchpriority="high"
+        aria-hidden="true"
+      />
+      <HeroSection />
+    </div>
+    <SolutionsSection />
+    <ProcessSection />
+    <AboutSection />
+    <ContactSection />
   </main>
+  <Footer />
+  <HomeMotion />
 </BaseLayout>
+
+<style>
+  .hero-composition {
+    position: relative;
+    isolation: isolate;
+    background: #020912;
+    padding-top: 7.5rem;
+  }
+
+  .hero-scene {
+    position: absolute;
+    z-index: -2;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 70% center;
+  }
+
+  .hero-composition::after {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgb(2 9 18 / 90%), transparent 24%, transparent 80%, #080f17),
+      linear-gradient(90deg, rgb(2 9 18 / 92%), rgb(2 9 18 / 68%) 36%, rgb(2 9 18 / 15%) 64%, transparent 80%);
+    content: '';
+    pointer-events: none;
+  }
+
+  @media (max-width: 900px) {
+    .hero-scene {
+      object-position: 65% center;
+    }
+
+    .hero-composition::after {
+      background:
+        linear-gradient(180deg, rgb(2 9 18 / 95%), transparent 35%, #080f17),
+        linear-gradient(90deg, rgb(2 9 18 / 95%), rgb(2 9 18 / 75%) 45%, rgb(2 9 18 / 15%));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero-scene {
+      top: auto;
+      height: 22rem;
+      object-position: 85% center;
+    }
+
+    .hero-composition::after {
+      top: auto;
+      height: 22rem;
+      background: linear-gradient(180deg, #020912, rgb(2 9 18 / 35%) 25%, transparent 50%, #080f17);
+    }
+  }
+</style>

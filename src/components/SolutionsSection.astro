@@ -1,0 +1,39 @@
+---
+const solutions = [
+  { title: 'Presença digital', description: 'Organizar como seu negócio se apresenta no ambiente digital, com informações claras e caminhos simples para o contato.', detail: 'Clareza para quem procura você' },
+  { title: 'Sites e landing pages', description: 'Apresentar sua empresa, uma oferta ou uma iniciativa em uma experiência acessível, responsiva e alinhada ao seu objetivo.', detail: 'Uma presença com propósito' },
+  { title: 'Automações', description: 'Avaliar tarefas repetitivas e conexões entre ferramentas para identificar o que pode ser simplificado com segurança.', detail: 'Menos atrito na rotina' },
+  { title: 'Inteligência artificial', description: 'Investigar onde a IA pode apoiar seu trabalho, considerando a qualidade dos dados, os limites da tecnologia e a supervisão humana.', detail: 'Aplicação responsável e contextual' },
+  { title: 'Soluções personalizadas', description: 'Explorar uma solução adequada quando as ferramentas disponíveis não atendem bem ao desafio, com escopo e viabilidade definidos antes da implementação.', detail: 'Tecnologia adequada à necessidade' },
+];
+const icons = [
+  'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM3 12h18M12 3c4 5 4 13 0 18-4-5-4-13 0-18Z',
+  'M4 4h16v16H4ZM4 9h16M7 6.5h.01M10 6.5h.01M8 13l-2 2 2 2M16 13l2 2-2 2M13 12l-2 6',
+  'M4 4h6v6H4ZM14 14h6v6h-6ZM10 7h7v7M7 10v7h7',
+  'M8 4h8v4h4v8h-4v4H8v-4H4V8h4ZM9 9h6v6H9ZM10 1v3M14 1v3M10 20v3M14 20v3M1 10h3M1 14h3M20 10h3M20 14h3',
+  'M4 5h16M4 12h16M4 19h16M8 3v4M16 10v4M10 17v4',
+];
+---
+<section class="section" id="solucoes" aria-labelledby="solutions-title">
+  <div class="container">
+    <div class="section-heading" data-reveal><p class="eyebrow">Possibilidades de atuação</p><h2 id="solutions-title">O desafio vem primeiro.<br />A solução vem depois.</h2><p>Estas são algumas possibilidades. O diagnóstico define o que faz sentido para seu negócio e o que é viável desenvolver em cada etapa.</p></div>
+    <div class="solutions-grid">{solutions.map((solution, index) => <article class="solution-card" data-reveal><div class="card-top" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d={icons[index]} /></svg><span class="card-index">0{index + 1}</span></div><h3>{solution.title}</h3><p>{solution.description}</p><span class="card-detail">{solution.detail}</span></article>)}</div>
+    <p class="section-note">Estas possibilidades não são uma lista fechada. Cada proposta considera suas necessidades, seu orçamento e a viabilidade de implementação.</p>
+  </div>
+</section>
+<style>
+  .solutions-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1rem; }
+  .solution-card { position: relative; isolation: isolate; grid-column: span 2; display: flex; flex-direction: column; padding: clamp(1.5rem, 3vw, 2rem); border: 1px solid var(--color-border); border-radius: .6rem; background: linear-gradient(145deg, var(--color-surface), var(--color-background)); transition: transform var(--motion-fast) var(--motion-ease), border-color var(--motion-fast) ease; }
+  .solution-card::before { content: ''; position: absolute; z-index: -1; inset: 0; border-radius: inherit; background: radial-gradient(ellipse at top left, rgb(119 182 239 / 10%), transparent 70%); opacity: 0; pointer-events: none; transition: opacity var(--motion-fast) ease; }
+  @media (hover: hover) and (pointer: fine) { .solution-card:hover { transform: translateY(-3px); border-color: #496789; } .solution-card:hover::before { opacity: 1; } }
+  .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+  .card-top svg { width: 28px; height: 28px; color: var(--color-blue); }
+  .solution-card:nth-last-child(-n + 2) { grid-column: span 3; }
+  .card-index { color: var(--color-muted); font-size: .8125rem; letter-spacing: .1em; }
+  h3 { margin: 0 0 .75rem; font-size: 1.1875rem; }
+  .solution-card p { color: var(--color-muted); margin: 0 0 1.75rem; }
+  .card-detail { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--color-border); color: #c7d2df; font-size: .8125rem; }
+  .section-note { color: var(--color-muted); font-size: .875rem; max-width: 56rem; margin: 1.5rem 0 0; }
+  @media (max-width: 900px) { .solutions-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .solution-card, .solution-card:nth-last-child(-n + 2) { grid-column: auto; } .solution-card:last-child { grid-column: 1 / -1; } }
+  @media (max-width: 640px) { .solutions-grid { grid-template-columns: 1fr; } .card-top { margin-bottom: 1.25rem; } }
+</style>
