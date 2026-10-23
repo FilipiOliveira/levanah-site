@@ -1,10 +1,22 @@
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 
 const html = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8');
 const staticHTML = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, '');
 const site = readFileSync(new URL('../src/data/site.ts', import.meta.url), 'utf8');
 const whatsappURL = site.match(/whatsappURL = '([^']+)'/)[1];
+assert.equal(new URL(whatsappURL).pathname, '/5519982392167', 'Confirmed WhatsApp number');
+for (const [, reference] of staticHTML.matchAll(/(?:href|src)="([^"]+)"/g)) {
+  if (!reference.startsWith('/') || reference.startsWith('//')) continue;
+  const path = reference.split(/[?#]/)[0];
+  assert.ok(existsSync(new URL(`../dist${path}`, import.meta.url)), `Missing local file: ${path}`);
+}
+for (const [, candidates] of staticHTML.matchAll(/srcset="([^"]+)"/g)) {
+  for (const candidate of candidates.split(',')) {
+    const path = candidate.trim().split(/\s+/)[0];
+    if (path.startsWith('/')) assert.ok(existsSync(new URL(`../dist${path}`, import.meta.url)), `Missing responsive image: ${path}`);
+  }
+}
 const ids = [...staticHTML.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
 assert.equal(new Set(ids).size, ids.length, 'Duplicate IDs');
 assert.equal((staticHTML.match(/<h1\b/g) ?? []).length, 1, 'One page heading');

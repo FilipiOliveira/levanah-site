@@ -3,6 +3,12 @@
   const menu = document.querySelector<HTMLDetailsElement>('.mobile-menu');
   const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-section-link]')];
   const sections = [...document.querySelectorAll<HTMLElement>('main > section[id]')];
+  const steps = [...document.querySelectorAll<HTMLElement>('[data-process-step]')];
+  const reveals = [...document.querySelectorAll<HTMLElement>('[data-reveal]')];
+  const restoredVisible = new Set(window.scrollY > 0 ? reveals.filter(element => {
+    const rect = element.getBoundingClientRect();
+    return rect.top < window.innerHeight && rect.bottom > 0;
+  }) : []);
   const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
   const animations = new Map<HTMLElement, Animation>();
   let frame = 0;
@@ -12,11 +18,21 @@
     frame = 0;
     const marker = headerHeight + Math.min(window.innerHeight * .25, 180);
     const positions = sections.map(section => ({ section, top: section.getBoundingClientRect().top }));
+    const stepPositions = steps.map(step => ({ step, rect: step.getBoundingClientRect() }));
+    const readingLine = headerHeight + (window.innerHeight - headerHeight) * .45;
+    const activeStep = stepPositions.find(({ rect }) => rect.top <= readingLine && rect.bottom > readingLine)?.step;
+    const progress = stepPositions.map(({ step, rect }) => ({
+      step, value: Math.max(0, Math.min(1, (readingLine - rect.top) / rect.height)),
+    }));
     const current = positions.filter(({ top }) => top <= marker).at(-1)?.section.id;
     header?.toggleAttribute('data-scrolled', window.scrollY > 24);
     links.forEach(link => {
       if (link.hash === `#${current}`) link.setAttribute('aria-current', 'location');
       else link.removeAttribute('aria-current');
+    });
+    progress.forEach(({ step, value }) => {
+      step.style.setProperty('--step-progress', motionPreference.matches ? '0' : String(value));
+      step.toggleAttribute('data-reading', step === activeStep);
     });
   }
 
@@ -54,6 +70,7 @@
   }
   function handlePreference() {
     if (motionPreference.matches) cancelAnimations();
+    scheduleNavigation();
   }
   function protectFocus(event: FocusEvent) {
     if (!(event.target instanceof Element)) return;
@@ -74,22 +91,30 @@
 
   // Only animate on entry: no hidden CSS state or dependency on the observer.
   const observer = typeof IntersectionObserver !== 'undefined' ? new IntersectionObserver(entries => {
+    let sequence = 0;
     entries.forEach(entry => {
       if (!entry.isIntersecting || !(entry.target instanceof HTMLElement)) return;
       const element = entry.target;
       observer?.unobserve(element);
       element.setAttribute('data-in-view', '');
       if (motionPreference.matches || typeof element.animate !== 'function' ||
-          element.contains(document.activeElement) || window.location.hash || window.scrollY > 0 && element.closest('.hero-content')) return;
+          element.contains(document.activeElement) ||
+          (window.location.hash && element.closest(window.location.hash === '#inicio' ? '.hero-content' : '[id]')?.id === window.location.hash.slice(1)) ||
+          restoredVisible.has(element) ||
+          window.scrollY > 0 && element.closest('.hero-content')) return;
+      const delay = Math.min(sequence++ * 70, 210);
       const animation = element.animate(
-        [{ opacity: .85, transform: 'translateY(10px)' }, { opacity: 1, transform: 'translateY(0)' }],
-        { duration: 400, easing: 'cubic-bezier(.2, .7, .2, 1)' },
+        [{ opacity: .2, translate: '0 22px' }, { opacity: 1, translate: '0 0' }],
+        { duration: 440, delay, fill: 'backwards', easing: 'cubic-bezier(.2, .7, .2, 1)' },
       );
       animations.set(element, animation);
-      animation.finished.then(() => animations.delete(element), () => animations.delete(element));
+      animation.finished.then(() => {
+        animation.cancel();
+        animations.delete(element);
+      }, () => animations.delete(element));
     });
-  }, { threshold: .12 }) : undefined;
-  document.querySelectorAll<HTMLElement>('[data-reveal]').forEach(element => observer?.observe(element));
+  }, { threshold: .12, rootMargin: '0px 0px -32px 0px' }) : undefined;
+  reveals.forEach(element => observer?.observe(element));
 
   window.addEventListener('pagehide', (event: PageTransitionEvent) => {
     if (event.persisted) { cancelAnimations(); return; }

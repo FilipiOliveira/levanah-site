@@ -11,8 +11,9 @@
   --font-heading: Montserrat, "Segoe UI", system-ui, sans-serif;
   --content-width: 1200px;
   --header-height: 120px;
-  --motion-fast: 180ms;
-  --motion-entry: 400ms;
+  --motion-fast: 200ms;
+  --motion-soft: 320ms;
+  --motion-entry: 440ms;
   --motion-ease: cubic-bezier(.2, .7, .2, 1);
 }
 
@@ -98,15 +99,17 @@ a {
   cursor: pointer;
   position: relative;
   isolation: isolate;
-  transition: background-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease;
+  transition: background-color var(--motion-fast) var(--motion-ease), box-shadow var(--motion-fast) var(--motion-ease);
 }
 
-.challenge-cta::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(115deg, transparent 15%, rgb(255 255 255 / 24%) 50%, transparent 85%); opacity: 0; pointer-events: none; transition: opacity var(--motion-fast) ease; }
+.challenge-cta::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(115deg, transparent 15%, rgb(255 255 255 / 24%) 50%, transparent 85%); opacity: 0; pointer-events: none; transition: opacity var(--motion-fast) var(--motion-ease); }
 .challenge-cta:focus-visible { background: #ffe6bd; box-shadow: 0 4px 20px rgb(244 217 167 / 12%); }
 .challenge-cta:focus-visible::before { opacity: 1; }
 .challenge-cta:active { background: #e6c58f; box-shadow: none; }
 .challenge-cta > span, .secondary-cta > span, .text-link > span { transition: transform var(--motion-fast) var(--motion-ease); }
-.secondary-cta, .text-link, .brand { transition: color var(--motion-fast) ease; }
+.secondary-cta, .text-link, .brand { transition: color var(--motion-fast) var(--motion-ease); }
+.text-link { text-decoration: underline; text-decoration-color: transparent; text-underline-offset: .3em; transition: color var(--motion-fast) var(--motion-ease), text-decoration-color var(--motion-fast) var(--motion-ease); }
+.text-link:is(:hover, :focus-visible) { text-decoration-color: currentColor; }
 .secondary-cta:focus-visible { color: var(--color-gold); }
 .brand:focus-visible { color: var(--color-gold); }
 @media (hover: hover) and (pointer: fine) {
@@ -152,3 +155,5 @@ h3 { font-weight: 600; line-height: 1.4; }
     scroll-behavior: auto !important;
   }
 }
+
+@media (prefers-reduced-motion: reduce) { .challenge-cta > span, .secondary-cta > span, .text-link > span { transform: none !important; } }

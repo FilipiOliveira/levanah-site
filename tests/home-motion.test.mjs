@@ -15,21 +15,25 @@ class Events {
 }
 class Element extends Events {
   attributes = new Map();
+  properties = new Map();
+  style = { setProperty: (name, value) => this.properties.set(name, value) };
   children = [];
   contains(element) { return element === this || this.children.includes(element); }
   setAttribute(name, value) { this.attributes.set(name, value); }
   removeAttribute(name) { this.attributes.delete(name); if (name === 'open') this.open = false; }
   toggleAttribute(name, enabled) { if (enabled) this.setAttribute(name, ''); else this.removeAttribute(name); }
   closest(selector) { return selector === 'a' && this.hash ? this : null; }
-  getBoundingClientRect() { return { top: this.top }; }
-  animate() {
+  getBoundingClientRect() { return { top: this.top, height: 180, bottom: this.top + 180 }; }
+  animate(keyframes, options) {
     const animation = { canceled: false, cancel() { this.canceled = true; }, finished: new Promise(() => {}) };
     this.animation = animation;
+    this.keyframes = keyframes;
+    this.animationOptions = options;
     return animation;
   }
 }
 
-function setup({ reduced = false, observerSupported = true, hash = '' } = {}) {
+function setup({ reduced = false, observerSupported = true, hash = '', scrollY = 0 } = {}) {
   const header = new Element();
   header.offsetHeight = 112;
   const menu = new Element();
@@ -47,15 +51,22 @@ function setup({ reduced = false, observerSupported = true, hash = '' } = {}) {
     return link;
   }));
   const reveal = new Element();
+  reveal.top = 200;
+  const secondReveal = new Element();
+  const steps = Array.from({ length: 6 }, (_, index) => {
+    const step = new Element();
+    step.top = 200 + index * 180;
+    return step;
+  });
   const document = new Events();
   document.activeElement = null;
   document.documentElement = { style: { setProperty() {} } };
   document.querySelector = selector => selector === '[data-header]' ? header : menu;
-  document.querySelectorAll = selector => selector === '[data-section-link]' ? links : selector === '[data-reveal]' ? [reveal] : sections;
+  document.querySelectorAll = selector => selector === '[data-section-link]' ? links : selector === '[data-reveal]' ? [reveal, secondReveal] : selector === '[data-process-step]' ? steps : sections;
   const preference = new Events();
   preference.matches = reduced;
   const window = new Events();
-  Object.assign(window, { innerHeight: 800, scrollY: 0, location: { hash }, matchMedia: () => preference });
+  Object.assign(window, { innerHeight: 800, scrollY, location: { hash }, matchMedia: () => preference });
   let callback;
   let disconnected = false;
   const frames = [];
@@ -73,8 +84,9 @@ function setup({ reduced = false, observerSupported = true, hash = '' } = {}) {
   });
   const flush = () => { while (frames.length) frames.shift()(); };
   flush();
-  return { header, menu, summary, sections, links, reveal, document, window, preference, flush,
+  return { header, menu, summary, sections, links, reveal, secondReveal, steps, document, window, preference, flush,
     enter: () => callback([{ isIntersecting: true, target: reveal }]),
+    enterBoth: () => callback([reveal, secondReveal].map(target => ({ isIntersecting: true, target }))),
     disconnected: () => disconnected };
 }
 
@@ -114,13 +126,47 @@ test('missing observer keeps navigation working without applying animation style
   assert.equal(state.header.attributes.has('data-scrolled'), true);
 });
 
-test('reduced motion and direct anchors skip entry animations', () => {
-  for (const options of [{ reduced: true }, { hash: '#sobre' }]) {
+test('reduced motion skips entry animations', () => {
+  for (const options of [{ reduced: true }]) {
     const state = setup(options);
     state.enter();
     assert.equal(state.reveal.animation, undefined);
     assert.equal(state.reveal.attributes.has('data-in-view'), true);
   }
+});
+
+test('an existing anchor does not disable reveals elsewhere and entries are staggered', () => {
+  const state = setup({ hash: '#sobre' });
+  state.enterBoth();
+  assert.equal(state.reveal.animationOptions.delay, 0);
+  assert.equal(state.secondReveal.animationOptions.delay, 70);
+  assert.equal(state.reveal.keyframes[0].opacity, .2);
+});
+
+test('restored visible content and anchor target remain still without disabling future reveals', () => {
+  const restored = setup({ scrollY: 600 });
+  restored.enterBoth();
+  assert.equal(restored.reveal.animation, undefined);
+  assert.ok(restored.secondReveal.animation);
+  const anchored = setup({ hash: '#sobre' });
+  anchored.reveal.closest = selector => selector === '[id]' ? { id: 'sobre' } : null;
+  anchored.enter();
+  assert.equal(anchored.reveal.animation, undefined);
+});
+
+test('reading progress follows scroll in both directions and reduced motion removes fill', () => {
+  const state = setup();
+  assert.equal(state.steps.filter(step => step.attributes.has('data-reading')).length, 1);
+  assert.equal(state.steps[1].attributes.has('data-reading'), true);
+  assert.ok(Number(state.steps[1].properties.get('--step-progress')) > 0);
+  state.steps.forEach(step => { step.top += 500; });
+  state.window.dispatch('scroll');
+  state.flush();
+  assert.equal(state.steps.some(step => step.attributes.has('data-reading')), false);
+  state.preference.matches = true;
+  state.preference.dispatch('change');
+  state.flush();
+  assert.ok(state.steps.every(step => step.properties.get('--step-progress') === '0'));
 });
 
 test('missing animation API or already focused content remains static on entry', () => {
